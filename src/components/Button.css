@@ -1,0 +1,20 @@
+button {
+    font-family: Inter, serif;
+    font-weight: 500;
+    font-style: normal;
+    background-color: rgb(255, 255, 255);
+    font-size: 16px;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    border-radius: 6px;
+    outline: none;
+    border: 1px solid #E2E3E5;
+}
+
+.enabled:hover {
+    border: 2px solid #5D5FEF;
+}
+
+.enabled:active {
+    background-color: #5D5FEF;
+}

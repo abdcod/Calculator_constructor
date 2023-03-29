@@ -1,0 +1,15 @@
+.numbers {
+    width: 240px;
+    height: 224px;
+    display: grid;
+    box-sizing: border-box;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: 10px 0;
+    border-radius: 4px;
+    gap: 4px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 4px 4px;
+    position: relative;
+}
