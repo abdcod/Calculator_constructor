@@ -119,9 +119,9 @@ body {
 }
 
 .toggle_buttons {
+  box-sizing: border-box;
   height: 36px;
   background: none;
-  border: none;
   border-radius: 5px;
   display: flex;
   flex-direction: row;
@@ -132,14 +132,7 @@ body {
   font-size: 14px;
   line-height: 15px;
   color: #4D5562;
-}
-
-.toggle_buttons:hover {
-  border: none
-}
-
-.toggle_buttons:active {
-  background: none;
+  border: 1px solid #F3F4F6;
 }
 
 .toggle_buttons:disabled {
