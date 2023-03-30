@@ -1,7 +1,16 @@
 import React from 'react';
 import "./Signs.css"
+import {ConnectDragSource} from "react-dnd";
 
-const Signs = ({children, signsDrag, style, dragBottomTipForSigns, dragTopTipForSigns, disabled}:any) => {
+type SignsPropsType = {
+    children:JSX.Element[],
+    signsDrag?:ConnectDragSource,
+    style?: { borderRadius?: 0, boxShadow?: "none", opacity?: "50%" | "100%", cursor?: "move" | "auto"},
+    dragBottomTipForSigns?:boolean
+    dragTopTipForSigns?:boolean
+}
+
+const Signs = ({children, signsDrag, style, dragBottomTipForSigns, dragTopTipForSigns}:SignsPropsType) => {
 
     let classes = "signs";
     if (dragBottomTipForSigns) {

@@ -1,7 +1,16 @@
 import React from 'react';
 import "./Numbers.css"
+import {ConnectDragSource} from "react-dnd";
 
-const Numbers = ({children, numbersDrag, style, dragTopTipForNumbers, dragUnderTipForNumbers}:any) => {
+type NumbersPropsType = {
+    children: JSX.Element[];
+    numbersDrag?: ConnectDragSource;
+    style: {borderRadius?: 0, boxShadow?: "none", opacity?: "50%" | "100%", cursor?: "move" | "auto"}
+    dragTopTipForNumbers?: boolean
+    dragUnderTipForNumbers?: boolean
+}
+
+const Numbers = ({children, numbersDrag, style, dragTopTipForNumbers, dragUnderTipForNumbers}:NumbersPropsType) => {
 
     let classes = "numbers";
     if (dragUnderTipForNumbers) {

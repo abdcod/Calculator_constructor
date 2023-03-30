@@ -1,5 +1,5 @@
 // @ts-ignore
-import React, {useState} from "react";
+import React, {FormEvent, useState} from "react";
 import Screen from "./components/Screen";
 import Button from "./components/Button";
 import Signs from "./components/Signs";
@@ -15,19 +15,19 @@ import brackets1 from "./content/brackets1.svg"
 const math_signs = ["/", "X", "-", "+"];
 const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, "."];
 
-const toLocaleString = (num: any) =>
+const toLocaleString = (num: number | string) =>
     String(num).replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, "$1 ");
 
 const removeSpaces = (num: any) => num.toString().replace(/\s/g, "");
 
-const deleteNulls = (str: any) => {
+const deleteNulls = (str: string) => {
     while (str[str.length - 1] === "0") {
         str = str.slice(0, -1);
     }
     return str;
 }
 
-const math = (a: any, b: any, sign: any) => {
+const math = (a: number, b: number, sign: string) => {
 
     let temp;
     if (sign === "+") {
@@ -36,16 +36,17 @@ const math = (a: any, b: any, sign: any) => {
         temp = a - b;
     } else if (sign === "X") {
         temp = a * b;
-        if (!Number.isInteger(temp)) {
-            temp = temp.toFixed(20);
-            temp = deleteNulls(temp);
-        }
+        // обсуждаемый момент... код можно вставить, чтобы не было экспоненциальной записи
+        // if (!Number.isInteger(temp)) {
+        //     temp = temp.toFixed(20);
+        //     temp = deleteNulls(temp);
+        // }
     } else if (sign === "/") {
         temp = a / b;
-        if (!Number.isInteger(temp)) {
-            temp = temp.toFixed(20);
-            temp = deleteNulls(temp);
-        }
+        // if (!Number.isInteger(temp)) {
+        //     temp = temp.toFixed(20);
+        //     temp = deleteNulls(temp);
+        // }
     } else {
         temp = a;
     }
@@ -61,7 +62,7 @@ const App = () => {
         res: 0,
     });
 
-    const [runTimeMode, setRunTimeMode] = useState(false)
+    const [runTimeMode, setRunTimeMode] = useState<boolean>(false)
 
     const toggleConstructorMode = () => {
         if (runTimeMode) {
@@ -72,7 +73,7 @@ const App = () => {
         } else setRunTimeMode(true)
     }
 
-    const [screenBoard, setScreenBoard] = useState(false);
+    const [screenBoard, setScreenBoard] = useState<boolean>(false);
 
     const [{isDragging}, drag] = useDrag(() => ({
         type: "screen",
@@ -84,17 +85,17 @@ const App = () => {
 
     const [, drop] = useDrop(() => ({
         accept: "screen",
-        drop: (item: any) => addScreen(item.id),
+        drop: (item: { id: FormEvent<HTMLFormElement> }) => addScreen(item.id),
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
     }))
 
-    const addScreen = (id: any) => {
+    const addScreen = (id: React.FormEvent<HTMLFormElement>) => {
         setScreenBoard(true)
     }
 
-    let [buttonBoard, setButtonBoard] = useState([]);
+    let [buttonBoard, setButtonBoard] = useState<{id:number}[]>([]);
 
     const [{isSignsDragging}, signsDrag] = useDrag(() => ({
         type: "button",
@@ -122,14 +123,14 @@ const App = () => {
 
     const [, buttonsDrop] = useDrop(() => ({
         accept: "button",
-        drop: (item: any) => addSigns(item.id),
+        drop: (item: { id: FormEvent<HTMLFormElement> }) => addSigns(item.id),
         collect: (monitor) => ({
             isButtonsOver: !!monitor.isOver(),
         }),
     }))
 
-    const addSigns = (id: any) => {
-        setButtonBoard((prev: any) => {
+    const addSigns = (id: React.FormEvent<HTMLFormElement>) => {
+        setButtonBoard((prev: { id: number }[]) => {
             if (prev.length < 3) {
                 return [
                     ...prev, {id: id}
@@ -138,9 +139,9 @@ const App = () => {
         })
     }
 
-    const numClickHandler = (e: any) => {
+    const numClickHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const value = e.target.innerHTML;
+        const value = e.currentTarget.innerHTML;
         if (removeSpaces(calc.num).length < 16) {
             setCalc({
                 ...calc,
@@ -153,9 +154,9 @@ const App = () => {
         }
     };
 
-    const comaClickHandler = (e: any) => {
+    const comaClickHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const value = e.target.innerHTML;
+        const value = e.currentTarget.innerHTML;
 
         setCalc({
             ...calc,
@@ -163,10 +164,10 @@ const App = () => {
         });
     };
 
-    const signClickHandler = (e: any) => {
+    const signClickHandler = (e: React.FormEvent<HTMLFormElement>) => {
         setCalc({
             ...calc,
-            sign: e.target.innerHTML,
+            sign: e.currentTarget.innerHTML,
             res: !calc.num
                 ? calc.res
                 : !calc.res
@@ -231,7 +232,12 @@ const App = () => {
         });
     };
 
-    const buttonClickHandler = (e: any, btn: any) => {
+    type BtnType = string | number;
+
+    type buttonBoardElementType = {id: string};
+
+
+    const buttonClickHandler = (e: React.FormEvent<HTMLFormElement>, btn: BtnType) => {
         btn === "C" || calc.res === zeroDivisionError
             ? resetClickHandler()
             : btn === "+-"
@@ -247,7 +253,7 @@ const App = () => {
                                 : numClickHandler(e)
     }
 
-    let buttonBordIds = buttonBoard.map((i: any) => i.id)
+    let buttonBordIds = buttonBoard.map((i: { id: number }) => i.id)
 
     return (<>
         <div className="container_for_toggle">
@@ -265,7 +271,7 @@ const App = () => {
         </div>
         <div className="drop_and_drag">
             <div className="drag_from">
-                <Screen disabled={true} screenBoard={screenBoard} isDragging={isDragging}
+                <Screen disabled={true}
                         drag={(!runTimeMode && !screenBoard) ? drag : (() => {
                         })} style={
                     {
@@ -275,7 +281,7 @@ const App = () => {
                     }
                 }
                         value={calc.num ? calc.num : calc.res}/>
-                <Signs disabled={true}
+                <Signs
                        signsDrag={(!runTimeMode && !buttonBordIds.includes("1")) ? signsDrag : (() => {
                        })} style={{
                     opacity: (buttonBordIds.includes("1") || isSignsDragging) ? "50%" : "100%",
@@ -355,7 +361,7 @@ const App = () => {
                 {((screenBoard === false) && (buttonBoard[0]?.["id"] === "3") && isDragging) &&
                     <div className="place_for_screen tip_before_screen"></div>}
                 {<>
-                    <div ref={buttonsDrop} className="place_for_button">{buttonBoard.map((item: any) => {
+                    <div ref={buttonsDrop} className="place_for_button">{buttonBoard.map((item: buttonBoardElementType) => {
                         switch (item.id) {
                             case "1":
                                 let dragBottomTipForSigns = ((buttonBoard.length < 3) && (buttonBoard[buttonBoard.length - 1]["id"] === "1") && (isNumbersDragging || isEqualsDragging))
@@ -375,7 +381,7 @@ const App = () => {
                                                 className={runTimeMode ? "enabled" : ""}
                                                 key={i}
                                                 value={btn}
-                                                onClick={runTimeMode ? ((e: any) => buttonClickHandler(e, btn)) : undefined}
+                                                onClick={runTimeMode ? ((e:any ) => buttonClickHandler(e, btn)) : undefined}
                                             />
                                         );
                                     })}
